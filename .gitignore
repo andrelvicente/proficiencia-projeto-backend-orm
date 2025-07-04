@@ -1,0 +1,45 @@
+# Python-related files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.env
+.env
+
+# Virtual environment
+venv/
+.env/
+*.egg-info/
+.eggs/
+
+# Logs and temporary files
+*.log
+*.sqlite3
+*.db
+*.pid
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test coverage and reports
+.coverage
+htmlcov/
+.tox/
+.cache/
+pytest_cache/
+
+# Build and distribution files
+build/
+dist/
+*.egg
+*.egg-info/
+*.wheel
+
+# Alembic migration files
+migrations/versions/__pycache__/
+
+# Ignore node_modules if using JavaScript/TypeScript
+node_modules/

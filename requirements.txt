@@ -1,0 +1,11 @@
+fastapi==0.111.0 # Framework web assíncrono
+uvicorn[standard]==0.29.0 # Servidor ASGI para rodar o FastAPI
+SQLAlchemy==2.0.30 # ORM para interagir com o banco de dados
+psycopg2-binary==2.9.9 # Driver PostgreSQL para SQLAlchemy
+pydantic==2.7.1 # Validação de dados e serialização (usado pelo FastAPI e por você)
+pydantic-settings==2.2.1 # Para gerenciar configurações do ambiente (equivalente ao Settings que você criou)
+python-jose[cryptography]==3.3.0 # Para JWT (JSON Web Tokens)
+passlib[bcrypt]==1.7.4 # Para hash de senhas (bcrypt é o esquema de hash)
+python-dotenv==1.0.1 # Para carregar variáveis de ambiente de um arquivo .env
+email-validator==2.1.1 # Necessário para validação de campos EmailStr do Pydantic
+bcrypt==3.2.0 # Biblioteca para hashing de senhas
