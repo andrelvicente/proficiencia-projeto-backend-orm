@@ -10,7 +10,6 @@ from app.db.models import User as DBUser
 
 router = APIRouter()
 
-# Helper para HATEOAS (simplificado)
 def add_sensor_data_links(data: SensorDataOut) -> dict:
     links = {
         "self": {"href": f"/api/v1/sensor-data/{data.id}", "method": "GET"},

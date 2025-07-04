@@ -10,7 +10,6 @@ from app.db.models import User as DBUser
 
 router = APIRouter()
 
-# Helper para HATEOAS (simplificado)
 def add_device_links(device: DeviceOut) -> dict:
     links = {
         "self": {"href": f"/api/v1/devices/{device.id}", "method": "GET"},

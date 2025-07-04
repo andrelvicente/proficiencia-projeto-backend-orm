@@ -10,7 +10,6 @@ from app.db.models import User as DBUser
 
 router = APIRouter()
 
-# Helper para HATEOAS (simplificado)
 def add_project_links(project: ProjectOut) -> dict:
     links = {
         "self": {"href": f"/api/v1/projects/{project.id}", "method": "GET"},

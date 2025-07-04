@@ -9,7 +9,6 @@ from app.db.models import User as DBUser
 
 router = APIRouter()
 
-# Helper para HATEOAS (simplificado)
 def add_tag_links(tag: TagOut) -> dict:
     links = {
         "self": {"href": f"/api/v1/tags/{tag.id}", "method": "GET"},
