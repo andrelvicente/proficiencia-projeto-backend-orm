@@ -88,7 +88,7 @@ Siga os passos abaixo para configurar e iniciar a aplicação.
 ### 1\. Clonar o Repositório
 
 ```bash
-git clone <URL_DO_SEU_REPOSITORIO>
+git clone https://github.com/andrelvicente/proficiencia-projeto-backend-orm.git
 cd proficiencia-projeto-backend-orm # Ou o nome da sua pasta
 ```
 
@@ -99,7 +99,7 @@ Crie um arquivo `.env` na raiz do projeto e preencha com suas credenciais:
 ```dotenv
 # .env
 DATABASE_URL="postgresql://user:password@db:5432/iot_db"
-SECRET_KEY="sua_chave_secreta_super_segura_aqui_para_jwt_nao_esqueça_de_mudar_em_producao_mesmo"
+SECRET_KEY="sua_chave_secreta_super_segura_aqui_para_jwt"
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 ```
 
