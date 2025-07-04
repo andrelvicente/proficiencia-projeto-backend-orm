@@ -1,5 +1,3 @@
------
-
 # Gerenciador de Projetos IoT (Backend FastAPI)
 
 Este é um sistema backend robusto para gerenciamento de projetos de Internet das Coisas (IoT), desenvolvido em Python com **FastAPI** e **SQLAlchemy**. Ele atende aos requisitos de proficiência da disciplina, incluindo operações CRUD completas, suporte a HATEOAS, mapeamento ORM, controle de transações ACID e autenticação baseada em tokens.
