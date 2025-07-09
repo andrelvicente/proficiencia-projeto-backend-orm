@@ -6,6 +6,7 @@ from app.repositories.project import ProjectRepository
 from app.repositories.tag import TagRepository
 from fastapi import HTTPException, status
 
+
 class ProjectService:
     def __init__(self, db: Session):
         self.project_repo = ProjectRepository(db)
@@ -27,68 +28,62 @@ class ProjectService:
         return self.project_repo.search_by_text(query, ['name', 'description'], skip=skip, limit=limit)
 
     def create_project(self, project_in: ProjectCreate, current_user_id: uuid.UUID, tag_ids: list[uuid.UUID] = []) -> Project:
-        with self.project_repo.db.begin_nested(): # Transação ACID
-            project_data = project_in.model_dump()
-            project_data["user_id"] = current_user_id # Garante que o projeto é do usuário logado
+        project_data = project_in.model_dump()
+        project_data["user_id"] = current_user_id
 
-            new_project = self.project_repo.create(project_data)
-            
-            # Associar tags (exemplo de operação atômica em conjunto)
-            for tag_id in tag_ids:
-                tag = self.tag_repo.get_by_id(tag_id)
-                if not tag:
-                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Tag with ID {tag_id} not found.")
-                new_project.tags.append(tag)
-            
-            self.project_repo.db.commit() # Commit da transação
-            self.project_repo.db.refresh(new_project) # Recarrega para incluir tags
-            return new_project
+        new_project = self.project_repo.create(project_data)
+
+        for tag_id in tag_ids:
+            tag = self.tag_repo.get_by_id(tag_id)
+            if not tag:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Tag with ID {tag_id} not found.")
+            new_project.tags.append(tag)
+
+        return new_project
+
 
     def update_project(self, project_id: uuid.UUID, project_in: ProjectUpdate, current_user_id: uuid.UUID) -> Project:
         project = self.get_project(project_id)
         if project.user_id != current_user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to update this project")
-        
-        with self.project_repo.db.begin_nested(): # Transação ACID
+
+        with self.project_repo.db.begin_nested():
             updated_project = self.project_repo.update(project, project_in.model_dump(exclude_unset=True))
-            self.project_repo.db.commit()
             return updated_project
 
     def delete_project(self, project_id: uuid.UUID, current_user_id: uuid.UUID):
         project = self.get_project(project_id)
         if project.user_id != current_user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete this project")
-        
-        with self.project_repo.db.begin_nested(): # Transação ACID
+
+        with self.project_repo.db.begin_nested():
             self.project_repo.delete(project)
-            self.project_repo.db.commit()
 
     def add_tags_to_project(self, project_id: uuid.UUID, tag_ids: list[uuid.UUID], current_user_id: uuid.UUID) -> Project:
         project = self.get_project(project_id)
         if project.user_id != current_user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to modify this project")
 
-        with self.project_repo.db.begin_nested():
-            for tag_id in tag_ids:
-                tag = self.tag_repo.get_by_id(tag_id)
-                if not tag:
-                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Tag with ID {tag_id} not found.")
-                if tag not in project.tags:
-                    project.tags.append(tag)
-            self.project_repo.db.commit()
-            self.project_repo.db.refresh(project)
-            return project
+        for tag_id in tag_ids:
+            tag = self.tag_repo.get_by_id(tag_id)
+            if not tag:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Tag with ID {tag_id} not found.")
+            if tag not in project.tags:
+                project.tags.append(tag)
+        updated_project = self.project_repo.update(project, {})
+        return updated_project
+
 
     def remove_tags_from_project(self, project_id: uuid.UUID, tag_ids: list[uuid.UUID], current_user_id: uuid.UUID) -> Project:
         project = self.get_project(project_id)
         if project.user_id != current_user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to modify this project")
 
-        with self.project_repo.db.begin_nested():
-            for tag_id in tag_ids:
-                tag_to_remove = next((t for t in project.tags if t.id == tag_id), None)
-                if tag_to_remove:
-                    project.tags.remove(tag_to_remove)
-            self.project_repo.db.commit()
-            self.project_repo.db.refresh(project)
-            return project
+        for tag_id in tag_ids:
+            tag_to_remove = next((t for t in project.tags if t.id == tag_id), None)
+            if tag_to_remove:
+                project.tags.remove(tag_to_remove)
+
+        updated_project = self.project_repo.update(project, {})
+        return updated_project
+

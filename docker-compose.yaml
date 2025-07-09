@@ -17,16 +17,13 @@ services:
     ports:
       - "8000:8000"
     environment:
-      # É uma boa prática carregar o .env diretamente com a API,
-      # mas para Docker Compose, definir aqui é mais direto
       DATABASE_URL: postgresql://user:password@db:5432/iot_db
       SECRET_KEY: "sua_chave_secreta_super_segura_aqui_para_jwt_nao_esqueça_de_mudar_em_producao_mesmo"
       ACCESS_TOKEN_EXPIRE_MINUTES: 60
     depends_on:
       - db
     volumes:
-      - .:/app # Mantém este volume para desenvolvimento, permitindo --reload
-    # ATENÇÃO: Mudança AQUI
+      - .:/app 
     command: ["bash", "-c", "uvicorn app.main:create_app --host 0.0.0.0 --port 8000 --reload --factory"]
 
 

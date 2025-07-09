@@ -43,6 +43,6 @@ class BaseRepository(Generic[ModelType]):
                 filters.append(func.lower(getattr(self.model, field)).like(f"%{query.lower()}%"))
         
         if not filters:
-            return [] # No searchable fields provided or found
+            return [] 
 
         return self.db.query(self.model).filter(func.or_(*filters)).offset(skip).limit(limit).all()

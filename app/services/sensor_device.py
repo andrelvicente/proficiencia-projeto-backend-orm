@@ -31,26 +31,21 @@ class SensorService:
         if not device or device.project.user_id != current_user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Device not found or not authorized to add sensors to it")
         
-        with self.sensor_repo.db.begin_nested(): # Transação ACID
-            new_sensor = self.sensor_repo.create(sensor_in.model_dump())
-            self.sensor_repo.db.commit()
-            return new_sensor
+
+        new_sensor = self.sensor_repo.create(sensor_in.model_dump())
+        return new_sensor
 
     def update_sensor(self, sensor_id: uuid.UUID, sensor_in: SensorUpdate, current_user_id: uuid.UUID) -> Sensor:
         sensor = self.get_sensor(sensor_id)
         if sensor.device.project.user_id != current_user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to update this sensor")
         
-        with self.sensor_repo.db.begin_nested(): # Transação ACID
-            updated_sensor = self.sensor_repo.update(sensor, sensor_in.model_dump(exclude_unset=True))
-            self.sensor_repo.db.commit()
-            return updated_sensor
+        updated_sensor = self.sensor_repo.update(sensor, sensor_in.model_dump(exclude_unset=True))
+        return updated_sensor
 
     def delete_sensor(self, sensor_id: uuid.UUID, current_user_id: uuid.UUID):
         sensor = self.get_sensor(sensor_id)
         if sensor.device.project.user_id != current_user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete this sensor")
         
-        with self.sensor_repo.db.begin_nested(): # Transação ACID
-            self.sensor_repo.delete(sensor)
-            self.sensor_repo.db.commit()
+        self.sensor_repo.delete(sensor)

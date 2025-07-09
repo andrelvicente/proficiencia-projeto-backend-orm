@@ -32,16 +32,12 @@ class SensorDataService:
         if not sensor or sensor.device.project.user_id != current_user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Sensor not found or not authorized to add data to it")
         
-        with self.sensor_data_repo.db.begin_nested(): # Transação ACID
-            new_data = self.sensor_data_repo.create(data_in.model_dump())
-            self.sensor_data_repo.db.commit()
-            return new_data
+        new_data = self.sensor_data_repo.create(data_in.model_dump())
+        return new_data
 
     def delete_sensor_data(self, data_id: uuid.UUID, current_user_id: uuid.UUID):
         data = self.get_sensor_data(data_id)
         if data.sensor.device.project.user_id != current_user_id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete this sensor data")
         
-        with self.sensor_data_repo.db.begin_nested(): # Transação ACID
-            self.sensor_data_repo.delete(data)
-            self.sensor_data_repo.db.commit()
+        self.sensor_data_repo.delete(data)

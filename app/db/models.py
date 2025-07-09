@@ -5,7 +5,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from app.db.base import Base
 
-# Tabela de junção para Many-to-Many: Project e Tag
 project_tags = Table(
     'project_tags',
     Base.metadata,
@@ -13,7 +12,6 @@ project_tags = Table(
     Column('tag_id', UUID(as_uuid=True), ForeignKey('tags.id', ondelete="CASCADE"), primary_key=True)
 )
 
-# Tabela de junção para Many-to-Many: Device e Tag
 device_tags = Table(
     'device_tags',
     Base.metadata,
