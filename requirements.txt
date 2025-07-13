@@ -9,3 +9,6 @@ passlib[bcrypt]==1.7.4 # Para hash de senhas (bcrypt é o esquema de hash)
 python-dotenv==1.0.1 # Para carregar variáveis de ambiente de um arquivo .env
 email-validator==2.1.1 # Necessário para validação de campos EmailStr do Pydantic
 bcrypt==3.2.0 # Biblioteca para hashing de senhas
+requests==2.32.3  # Adicionado para fazer requisições HTTP nos testes
+pytest==8.2.2 # Adicionado para o framework de testes
+alembic==1.13.1 # Para migrações de banco de dados

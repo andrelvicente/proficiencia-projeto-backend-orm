@@ -21,3 +21,14 @@ class SensorDataOut(SensorDataBase):
 
     class Config:
         from_attributes = True
+        
+class SensorReading(BaseModel):
+    sensor_name_or_id: str
+    value: Decimal
+    unit_of_measurement: str | None = None
+    timestamp: datetime | None = None
+
+# Schema para o payload completo de ingestão de dados de um dispositivo.
+class IngestDataPayload(BaseModel):
+    device_serial_number: str
+    readings: list[SensorReading]

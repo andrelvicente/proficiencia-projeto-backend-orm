@@ -62,6 +62,8 @@ class Device(Base):
     project = relationship("Project", back_populates="devices")
     sensors = relationship("Sensor", back_populates="device", cascade="all, delete-orphan")
     tags = relationship("Tag", secondary=device_tags, back_populates="devices")
+    commands = relationship("Command", back_populates="device", cascade="all, delete-orphan")
+
 
 class Sensor(Base):
     __tablename__ = "sensors"
@@ -96,3 +98,18 @@ class Tag(Base):
 
     projects = relationship("Project", secondary=project_tags, back_populates="tags")
     devices = relationship("Device", secondary=device_tags, back_populates="tags")
+    
+class Command(Base):
+    __tablename__ = "commands"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    device_id = Column(UUID(as_uuid=True), ForeignKey("devices.id", ondelete="CASCADE"), nullable=False)
+    command_type = Column(String(50), nullable=False) # Ex: 'ligar_bomba', 'desligar_luz'
+    parameters = Column(Text, nullable=True) # JSON string ou texto com parâmetros adicionais
+    status = Column(String(20), default='pending') # 'pending', 'sent', 'acknowledged', 'failed', 'completed'
+    issued_at = Column(DateTime(timezone=False), server_default=func.now())
+    completed_at = Column(DateTime(timezone=False), nullable=True)
+    response_message = Column(Text, nullable=True) # Mensagem de resposta do dispositivo
+
+    device = relationship("Device", back_populates="commands")
+    
