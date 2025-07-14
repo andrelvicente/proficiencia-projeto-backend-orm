@@ -97,8 +97,5 @@ def gateway_update_command_status(command_id: uuid.UUID, command_update: Command
     Não requer autenticação de usuário, mas em produção exigiria token de dispositivo.
     """
     command_service = CommandService(db)
-    # Não é necessário passar current_user_id aqui, pois a autorização é implícita pelo comando_id
-    # e a expectativa é que um dispositivo legítimo esteja atualizando.
-    # Em produção, um token de dispositivo validaria que o dispositivo tem permissão para este command_id.
-    updated_command = command_service.update_command(command_id, command_update, current_user_id=None) # current_user_id=None pois não há usuário autenticado
+    updated_command = command_service.update_command(command_id, command_update, current_user_id=None)
     return add_command_links(CommandOut.model_validate(updated_command))

@@ -32,3 +32,34 @@ class SensorReading(BaseModel):
 class IngestDataPayload(BaseModel):
     device_serial_number: str
     readings: list[SensorReading]
+
+class SensorDailyAverage(BaseModel):
+    sensor_id: uuid.UUID
+    sensor_name: str
+    date: str # Formato YYYY-MM-DD
+    average_value: Decimal
+    unit_of_measurement: str | None = None
+
+    class Config:
+        from_attributes = True
+
+class SensorWeeklyAverage(BaseModel):
+    sensor_id: uuid.UUID
+    sensor_name: str
+    week_start_date: str # Formato YYYY-MM-DD (início da semana)
+    average_value: Decimal
+    unit_of_measurement: str | None = None
+
+    class Config:
+        from_attributes = True
+
+class SensorMonthlyAverage(BaseModel):
+    sensor_id: uuid.UUID
+    sensor_name: str
+    month: str # Formato YYYY-MM
+    average_value: Decimal
+    unit_of_measurement: str | None = None
+
+    class Config:
+        from_attributes = True
+        

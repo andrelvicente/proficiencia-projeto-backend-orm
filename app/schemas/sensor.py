@@ -1,7 +1,10 @@
+from typing import List
 from pydantic import BaseModel
 from datetime import datetime
 import uuid
 from decimal import Decimal
+# Forward Reference
+from app.schemas.sensor_data import SensorDataOut
 
 # Base para criação/leitura
 class SensorBase(BaseModel):
@@ -32,7 +35,15 @@ class SensorOut(SensorBase):
 
     class Config:
         from_attributes = True
+        
+class SensorWithRecentData(BaseModel):
+    sensor_id: uuid.UUID
+    sensor_name: str
+    unit_of_measurement: str | None = None
+    recent_data: List[SensorDataOut]
 
-# Forward Reference
-from app.schemas.sensor_data import SensorDataOut
+    class Config:
+        from_attributes = True
+
+
 SensorOut.model_rebuild()

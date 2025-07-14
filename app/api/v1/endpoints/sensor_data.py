@@ -111,44 +111,42 @@ def ingest_generic_sensor_data(
     processed_data_out = [] # Para retornar os dados que foram ingeridos com sucesso
 
     # Use uma transação para toda a operação de ingestão do payload
-    with db.begin_nested(): # Inicia a transação ACID
-        for reading in payload.readings:
-            try:
-                # Tenta encontrar o sensor usando o nome/ID fornecido e o ID do dispositivo
-                sensor = sensor_service.sensor_repo.get_by_name_and_device(
+    for reading in payload.readings:
+        try:
+            # Tenta encontrar o sensor usando o nome/ID fornecido e o ID do dispositivo
+            sensor = sensor_service.sensor_repo.get_by_name_and_device(
+                name=reading.sensor_name_or_id,
+                device_id=device.id
+            )
+            if not sensor:
+                # Se o sensor não existir, cria-o dinamicamente
+                new_sensor_schema = SensorCreate(
                     name=reading.sensor_name_or_id,
+                    unit_of_measurement=reading.unit_of_measurement,
                     device_id=device.id
                 )
+                sensor = sensor_service.create_sensor(new_sensor_schema, owner_user_id)
+                print(f"DEBUG: Sensor '{reading.sensor_name_or_id}' criado (ID: {sensor.id}) para o dispositivo '{device.name}'.")
 
-                if not sensor:
-                    # Se o sensor não existir, cria-o dinamicamente
-                    new_sensor_schema = SensorCreate(
-                        name=reading.sensor_name_or_id,
-                        unit_of_measurement=reading.unit_of_measurement,
-                        device_id=device.id
-                    )
-                    sensor = sensor_service.create_sensor(new_sensor_schema, owner_user_id)
-                    print(f"DEBUG: Sensor '{reading.sensor_name_or_id}' criado (ID: {sensor.id}) para o dispositivo '{device.name}'.")
-
-                # Criar o SensorData para a leitura
-                sensor_data_schema = SensorDataCreate(
-                    sensor_id=sensor.id,
-                    value=reading.value,
-                    timestamp=reading.timestamp if reading.timestamp else datetime.utcnow()
-                )
+            # Criar o SensorData para a leitura
+            sensor_data_schema = SensorDataCreate(
+                sensor_id=sensor.id,
+                value=reading.value,
+                timestamp=reading.timestamp if reading.timestamp else datetime.utcnow()
+            )
                 
-                # A camada de serviço já garante a atomicidade interna, mas a transação externa
-                # garante que múltiplas inserções/criações para um payload sejam atômicas.
-                new_data = sensor_data_service.create_sensor_data(sensor_data_schema, owner_user_id)
-                processed_data_out.append(add_sensor_data_links(SensorDataOut.model_validate(new_data)))
-                ingested_count += 1
+            # A camada de serviço já garante a atomicidade interna, mas a transação externa
+            # garante que múltiplas inserções/criações para um payload sejam atômicas.
+            new_data = sensor_data_service.create_sensor_data(sensor_data_schema, owner_user_id)
+            processed_data_out.append(add_sensor_data_links(SensorDataOut.model_validate(new_data)))
+            ingested_count += 1
 
-            except HTTPException as e:
-                errors.append(f"Leitura '{reading.sensor_name_or_id}' (Disp: {payload.device_serial_number}): {e.detail}")
-                print(f"DEBUG: Erro ao processar leitura: {e.detail}")
-            except Exception as e:
-                errors.append(f"Leitura '{reading.sensor_name_or_id}' (Disp: {payload.device_serial_number}): Erro inesperado - {str(e)}")
-                print(f"DEBUG: Erro inesperado: {e}")
+        except HTTPException as e:
+            errors.append(f"Leitura '{reading.sensor_name_or_id}' (Disp: {payload.device_serial_number}): {e.detail}")
+            print(f"DEBUG: Erro ao processar leitura: {e.detail}")
+        except Exception as e:
+            errors.append(f"Leitura '{reading.sensor_name_or_id}' (Disp: {payload.device_serial_number}): Erro inesperado - {str(e)}")
+            print(f"DEBUG: Erro inesperado: {e}")
         
     response_detail = {
         "message": f"Ingested {ingested_count} readings successfully.",
