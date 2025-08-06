@@ -4,7 +4,7 @@ Este é um sistema backend robusto para gerenciamento de projetos de Internet da
 
 -----
 
-## Data de Apresentação e Local
+## Data de Apresentação e Local (aprovadoo🎉🎉🎉)
 
   * **Data:** 09/07/2025
   * **Hora:** 18:10
